@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import io from 'socket.io-client'
 import './App.css';
 
+import {produce} from 'immer'
+
 import PixelGrid from "./PixelGrid"
 import ColorSelect from './ColorSelect'
 
@@ -25,22 +27,27 @@ class App extends Component {
     })
 
     this.socket.on('updata-dot', info => {
-      this.setState({
-        pixelData: this.state.pixelData.map((row, rowIdx) => {
-          if (rowIdx === info.row) {
-            return row.map((color, colIdx) => {
-              if (colIdx === info.col) {
-                return info.color
-              } else {
-                return color
-              }
-            })
-          } else {
-            return row
-          }
-        })
-      })
+      this.setState(produce(this.state, state => {
+        state.pixelData[info.row][info.col] = info.color
+      }))
     })
+    // this.socket.on('updata-dot', info => {
+    //   this.setState({
+    //     pixelData: this.state.pixelData.map((row, rowIdx) => {
+    //       if (rowIdx === info.row) {
+    //         return row.map((color, colIdx) => {
+    //           if (colIdx === info.col) {
+    //             return info.color
+    //           } else {
+    //             return color
+    //           }
+    //         })
+    //       } else {
+    //         return row
+    //       }
+    //     })
+    //   })
+    // })
   }
 
   handlePixelClick = (row, col) => {

@@ -1,11 +1,15 @@
-import React from 'react'
+import React, {PureComponent} from 'react'
 
-function Dot(props) {
-  console.log('dot render')
-  return <td 
-          onClick={props.onClick} 
-          style={{width: '5px', height: '5px', backgroundColor: props.color}}>
-        </td>
+class Dot extends PureComponent{
+  render() {
+    console.log('dot render')
+    return (
+            <td 
+             onClick={() => this.props.onClick(this.props.row, this.props.col)} 
+             style={{width: '5px', height: '5px', backgroundColor: this.props.color}}>
+            </td>
+          )       
+  }
 }
 
 export default Dot

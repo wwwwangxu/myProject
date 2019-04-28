@@ -14,23 +14,26 @@ class App extends Component {
       currentColor: 'red',
       pixelData: null
     }
+    
+    this.socket = io('ws://localhost:3005/')
   }
   //发送网络请求和设置定时器应在componentDidMount阶段完成
   //因为此时Dom已渲染完成，可保证数据的正确加载
   componentDidMount() {
-    this.socket = io('ws://localhost:3005/')
-    this.socket.on('pixel-data', (data) => {
-      console.log(data)
-      this.setState({
-        pixelData: data
-      })
-    })
+    // this.socket.on('initial-pixel-data', (data) => {
+    //   console.log(data)
+    //   this.setState({
+    //     pixelData: data
+    //   })
+    // })
 
-    this.socket.on('updata-dot', info => {
-      this.setState(produce(this.state, state => {
-        state.pixelData[info.row][info.col] = info.color
-      }))
-    })
+    // this.socket.on('updata-dot', info => {
+    //   //使用不可变数据结构
+    //   this.setState(produce(this.state, state => {
+    //     state.pixelData[info.row][info.col] = info.color
+    //   }))
+    // })
+
     // this.socket.on('updata-dot', info => {
     //   this.setState({
     //     pixelData: this.state.pixelData.map((row, rowIdx) => {
@@ -50,12 +53,14 @@ class App extends Component {
     // })
   }
 
+  
   handlePixelClick = (row, col) => {
-    this.socket.emit('draw-dot', {
-      row, 
-      col,
-      color: this.state.currentColor
-    })
+    /*将被点击的dot的信息告知服务器*/
+    // this.socket.emit('draw-dot', {
+    //   row, 
+    //   col,
+    //   color: this.state.currentColor
+    // })
   }
 
   changeCurrentColor = (color) => {
@@ -68,7 +73,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <PixelGrid onPixelClick={this.handlePixelClick} pixels={this.state.pixelData} />
+        <PixelGrid onPixelClick={this.handlePixelClick} socket={this.socket} currentColor={this.state.currentColor} />
         <ColorSelect onChange={this.changeCurrentColor} color={ this.state.currentColor } />
       </div>
     )

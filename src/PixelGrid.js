@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 // import Dot from './Dot'
 
-
 function createImageFromArrayBuffer(buf) {
   return new Promise(resolve => {
     var blob = new Blob([buf], {type: 'image/png'})
@@ -14,6 +13,22 @@ function createImageFromArrayBuffer(buf) {
   })
 }
 
+var boxStyle = {
+  border: "1px solid", 
+  display: "inline-block", 
+  margin: "60px",
+  width: "200px",
+  height: '200px',
+  position: 'relative',
+  overflow: 'hidden'
+}
+var canvasStyle = {
+  display: "block",
+  position: 'absolute',
+  top: 0,
+  left: 0
+}
+
 class PixelGrid extends Component{
   constructor(props) {
     super(props)
@@ -21,15 +36,35 @@ class PixelGrid extends Component{
     this.canvas = null
 
     this.socket = this.props.socket
+
+    this.state = {
+      zoomLevel: 10
+    }
+  }
+
+  setUpZoomHandler = () => {
+    this.canvas.addEventListener('mousewheel', e => {
+      console.log(e)
+      if (e.deltaY < 0) {
+        this.setState({
+          zoomLevel: this.state.zoomLevel + 1
+        })
+      } else {
+        this.setState({
+          zoomLevel: this.state.zoomLevel - 1
+        })
+      }
+      e.preventDefault()
+    })
   }
 
   componentDidMount() {
+    this.setUpZoomHandler()
     this.canvas.style.imageRendering = 'pixelated'
     this.ctx = this.canvas.getContext('2d')
 
     this.socket.on('initial-pixel-data', async pixelData => {
       var image = await createImageFromArrayBuffer(pixelData)
-      // debugger
       this.canvas.width = image.width
       this.canvas.height = image.height
       this.ctx.drawImage(image, 0, 0)
@@ -56,17 +91,17 @@ class PixelGrid extends Component{
   handleDotClick = (e) => {
     var layerX = e.nativeEvent.layerX
     var layerY = e.nativeEvent.layerY
-    var row = Math.floor(layerX / 15)
-    var col = Math.floor(layerY / 15)
-    // console.log(row, col, this.props.currentColor)
+    var row = Math.floor(layerX / this.state.zoomLevel)
+    var col = Math.floor(layerY / this.state.zoomLevel)
+    console.log(row, col, this.props.currentColor)
     this.socket.emit('draw-dot', {row, col, color: this.props.currentColor})
   }
 
   render() {
     console.log('pixel grid render')
     return (
-      <div>
-        <canvas onClick={this.handleDotClick} style={{zoom: 15}} ref={el => this.canvas = el}></canvas>
+      <div style={boxStyle}>
+        <canvas onClick={this.handleDotClick} style={{...canvasStyle, zoom: this.state.zoomLevel}} ref={el => this.canvas = el}></canvas>
       </div>
       /* <table style={{tableLayout: 'fixed'}}>
         <tbody>

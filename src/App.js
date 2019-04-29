@@ -15,8 +15,8 @@ class App extends Component {
       pixelData: null
     }
     
-    // this.socket = io('ws://localhost:3005/')
-    this.socket = io('ws://10.0.0.114:3005/')
+    this.socket = io('ws://localhost:3005/')
+    // this.socket = io('ws://10.0.0.114:3005/')
   }
   //发送网络请求和设置定时器应在componentDidMount阶段完成
   //因为此时Dom已渲染完成，可保证数据的正确加载
@@ -74,6 +74,11 @@ class App extends Component {
   render() {
     return (
       <div>
+        <h1>Pixel Painter</h1> 
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
         <PixelGrid onPixelClick={this.handlePixelClick} socket={this.socket} currentColor={this.state.currentColor} />
         <ColorSelect onChange={this.changeCurrentColor} color={ this.state.currentColor } />
       </div>

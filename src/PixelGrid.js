@@ -1,5 +1,18 @@
 import React, { Component } from 'react'
-import Dot from './Dot'
+// import Dot from './Dot'
+
+
+function createImageFromArrayBuffer(buf) {
+  return new Promise(resolve => {
+    var blob = new Blob([buf], {type: 'image/png'})
+    var image = new Image()
+    var url = URL.createObjectURL(blob)
+    image.onload = function() {
+      resolve(image)
+    }
+    image.src = url
+  })
+}
 
 class PixelGrid extends Component{
   constructor(props) {
@@ -14,19 +27,24 @@ class PixelGrid extends Component{
     this.canvas.style.imageRendering = 'pixelated'
     this.ctx = this.canvas.getContext('2d')
 
-    this.socket.on('initial-pixel-data', pixelData => {
-      this.canvas.height = pixelData.length
-      this.canvas.width = pixelData[0].length
-      pixelData.forEach((row, rowIdx) => {
-        row.forEach((color, colIdx) => {
-          this.draw(rowIdx, colIdx, color)
-        })
-      })
+    this.socket.on('initial-pixel-data', async pixelData => {
+      var image = await createImageFromArrayBuffer(pixelData)
+      // debugger
+      this.canvas.width = image.width
+      this.canvas.height = image.height
+      this.ctx.drawImage(image, 0, 0)
+      // this.canvas.height = pixelData.length
+      // this.canvas.width = pixelData[0].length
+      // pixelData.forEach((row, rowIdx) => {
+      //   row.forEach((color, colIdx) => {
+      //     this.draw(rowIdx, colIdx, color)
+      //   })
+      // })
     })
 
     this.socket.on('update-dot', ({row, col, color}) => {
       // console.log(col, row, color)
-      this.draw(col, row, color)
+      this.draw(row, col, color)
     })
   }
 
@@ -38,8 +56,8 @@ class PixelGrid extends Component{
   handleDotClick = (e) => {
     var layerX = e.nativeEvent.layerX
     var layerY = e.nativeEvent.layerY
-    var row = Math.floor(layerY / 15)
-    var col = Math.floor(layerX / 15)
+    var row = Math.floor(layerX / 15)
+    var col = Math.floor(layerY / 15)
     // console.log(row, col, this.props.currentColor)
     this.socket.emit('draw-dot', {row, col, color: this.props.currentColor})
   }

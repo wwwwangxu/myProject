@@ -15,7 +15,8 @@ class App extends Component {
       pixelData: null
     }
     
-    this.socket = io('ws://localhost:3005/')
+    // this.socket = io('ws://localhost:3005/')
+    this.socket = io('ws://10.0.0.114:3005/')
   }
   //发送网络请求和设置定时器应在componentDidMount阶段完成
   //因为此时Dom已渲染完成，可保证数据的正确加载

@@ -11,7 +11,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      currentColor: 'red',
+      currentColor: '#ffffff',
       pixelData: null
     }
     
@@ -75,11 +75,8 @@ class App extends Component {
     return (
       <div>
         <h1>Pixel Painter</h1> 
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Moi accusamus incidunt modi iste fugiat eligendi assumenda aliquid laborum, recusandae deserunt omnis commodi, aperiam nobis.</p> 
-        <PixelGrid onPixelClick={this.handlePixelClick} socket={this.socket} currentColor={this.state.currentColor} />
+        <PixelGrid onPickColor={this.changeCurrentColor} socket={this.socket} currentColor={this.state.currentColor} />
+        <span id='color-pick-placeholder'></span>
         <ColorSelect onChange={this.changeCurrentColor} color={ this.state.currentColor } />
       </div>
     )

@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 // import Dot from './Dot'
 import ReactDom from 'react-dom'
 
+
+//图片转二进制数据
 function createImageFromArrayBuffer(buf) {
   return new Promise(resolve => {
     var blob = new Blob([buf], {type: 'image/png'})
@@ -14,6 +16,7 @@ function createImageFromArrayBuffer(buf) {
   })
 }
 
+//获得当前光标位置
 function getMousePos(e) {
   var layerX = e.layerX
   var layerY = e.layerY
@@ -28,10 +31,10 @@ var boxStyle = {
   border: "1px solid", 
   display: "inline-block", 
   margin: "60px",
-  width: "200px",
-  height: '200px',
+  width: "500px",
+  height: '500px',
   position: 'relative',
-  // overflow: 'hidden'
+  overflow: 'hidden'
 }
 var canvasStyle = {
   display: "block",
@@ -46,18 +49,20 @@ class PixelGrid extends Component{
     this.socket = this.props.socket
 
     this.state = {
-      zoomLevel: 10,
+      zoomLevel: 0.5,
       dotHoverX: 0,
       dotHoverY: 0,
       isPickingColor: false,
     }
   }
 
+  //在某个坐标画点
   draw = (row, col, color) => {
     this.ctx.fillStyle = color
     this.ctx.fillRect(row, col, 1, 1)
   }
 
+  //取色状态更改
   setPickColor = () => {
     console.log('正在取色')
     this.setState({
@@ -65,15 +70,16 @@ class PixelGrid extends Component{
     })
   }
 
+
+  //放大功能
   setUpZoomHandler = () => {
     this.canvasWrapper.addEventListener('mousewheel', e => {
       var newZoomLevel
       var oldZoomLevel = this.state.zoomLevel
-      console.log(e)
       if (e.deltaY < 0) {
-        newZoomLevel = this.state.zoomLevel + 1
+        newZoomLevel = this.state.zoomLevel + 0.5
       } else {
-        newZoomLevel = this.state.zoomLevel - 1
+        newZoomLevel = this.state.zoomLevel - 0.5
       }
 
       var a = oldZoomLevel
@@ -90,6 +96,13 @@ class PixelGrid extends Component{
       
       //var l2 = (l1 * a - (b / a - 1) * mouseX) / b  //使用zoom
       //var t2 = (t1 * a - (b / a - 1) * mouseY) / b
+
+      if (newZoomLevel < 0.5) {
+        newZoomLevel = 0.5
+        l2 = 0
+        t2 = 0
+      }
+
       this.canvasWrapper.style.left = l2 + 'px'
       this.canvasWrapper.style.top = t2 + 'px'
 
@@ -101,6 +114,7 @@ class PixelGrid extends Component{
     })
   }
 
+  //拖拽功能实现
   setUpDragHandler = () => {
     var startX, startY
     var startLeft, startTop
@@ -201,14 +215,21 @@ class PixelGrid extends Component{
         var cursorUrl = makeCursor(pixelColorCSS)
         this.canvas.style.cursor = `url(${cursorUrl}) 6 6, crosshair`
 
-        this.canvas.addEventListener('click', e => {
-          var [x, y] = getMousePos(e)
-          var pixelColor = Array.from(this.ctx.getImageData(x, y, 1, 1).data).slice(0, 3)
-          var hexColor = '#' + pixelColor.map(it => {
-            return it.toString(16).padStart(2, '0')
-          }).join('')
-          this.props.onPickColor(hexColor)
+      }
+    })
+
+    this.canvas.addEventListener('click', e => {
+      if (this.state.isPickingColor) {
+        var [x, y] = getMousePos(e)
+        var pixelColor = Array.from(this.ctx.getImageData(x, y, 1, 1).data).slice(0, 3)
+        var hexColor = '#' + pixelColor.map(it => {
+          return it.toString(16).padStart(2, '0')
+        }).join('')
+        this.props.onPickColor(hexColor)
+        this.setState({
+          isPickingColor: false
         })
+        this.canvas.style.cursor = ''
       }
     })
   }
@@ -248,20 +269,21 @@ class PixelGrid extends Component{
       return null
     } else {
       return ReactDom.createPortal((
-        <button onClick = {this.setPickColor}>{this.state.isPickingColor ? "正在取色..." : "取色"}</button>
+        <button style={{marginLeft: '200px'}} onClick = {this.setPickColor}>{this.state.isPickingColor ? "正在取色..." : "取色"}</button>
       ), el)
     }
   }
 
   render() {
-    console.log('pixel grid render')
     return (
       <div style={boxStyle}>
         {this.renderPickColorBtn()}
         <div className="canvas-wrapper" ref={el => this.canvasWrapper = el} style={{
           position: 'absolute',
           top: 0,
-          left: 0,  
+          left: 0,
+          width: '500px',
+          height: '500px'  
         }}>
           <span className="dot-hover-box" style={{
             boxShadow: '0 0 1px black',

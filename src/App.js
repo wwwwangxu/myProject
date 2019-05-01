@@ -6,6 +6,7 @@ import {produce} from 'immer'
 
 import PixelGrid from "./PixelGrid"
 import ColorSelect from './ColorSelect'
+import OnlineCount from './OnlineCount'
 
 class App extends Component {
   constructor(props) {
@@ -73,11 +74,16 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        <h1>Pixel Painter</h1> 
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <h1 style={{textAlign: 'center'}}>Pixel Painter</h1> 
         <PixelGrid onPickColor={this.changeCurrentColor} socket={this.socket} currentColor={this.state.currentColor} />
-        <span id='color-pick-placeholder'></span>
+        <span style={{display: 'block', marginLeft: '200px'}} id='color-pick-placeholder'></span>
         <ColorSelect onChange={this.changeCurrentColor} color={ this.state.currentColor } />
+        <OnlineCount socket={this.socket} />
       </div>
     )
   }
